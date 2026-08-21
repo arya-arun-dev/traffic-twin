@@ -1153,8 +1153,11 @@ function applyJunctionEntrySafety(
         ) {
 
           const maximumEntryPosition =
-            leaderPosition
-            - INITIAL_SPACING_METERS;
+            Math.max(
+              0,
+              leaderPosition
+              - INITIAL_SPACING_METERS
+            );
 
 
           if (
