@@ -186,8 +186,9 @@ export default function TrafficMap({
           latitude,
         ],
 
-        zoom:
-          13,
+        zoom: 14.5,
+        pitch: 35,
+        bearing: -10,
       });
 
 
@@ -350,37 +351,37 @@ export default function TrafficMap({
               ['linear'],
               ['zoom'],
 
-              10,
-              2.2,
+              12, 2,
 
-              14,
-              4.4,
+              16, 4.5,
 
-              17,
-              6.5,
+              19, 7,
             ],
 
             'circle-color': [
-              'step',
-              ['get', 'speedRatio'],
+              'case',
 
+              [
+                '<=',
+                ['get', 'speedRatio'],
+                0.35,
+              ],
               '#ef4444',
 
-              VERY_SLOW_SPEED_RATIO,
+              [
+                '<=',
+                ['get', 'speedRatio'],
+                0.70,
+              ],
               '#f59e0b',
 
-              SLOW_SPEED_RATIO,
               '#22c55e',
             ],
 
+            'circle-stroke-width': 0.8,
+
             'circle-stroke-color':
               '#ffffff',
-
-            'circle-stroke-width':
-              0.6,
-
-            'circle-opacity':
-              0.95,
           },
         });
 
@@ -494,17 +495,23 @@ export default function TrafficMap({
     }
 
 
-    map.easeTo({
+    map.flyTo({
       center: [
         longitude,
         latitude,
       ],
 
       zoom:
-        13,
+        14.5,
 
-      duration:
-        600,
+      pitch:
+        35,
+
+      bearing:
+        -10,
+
+      essential:
+        true,
     });
 
   }, [

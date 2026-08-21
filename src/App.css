@@ -1,4 +1,16 @@
-:root {
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
   font-family:
     Inter,
     ui-sans-serif,
@@ -8,1388 +20,693 @@
     "Segoe UI",
     sans-serif;
 
-  color:
-    #0f172a;
-
-  background:
-    #ffffff;
-
-  font-synthesis:
-    none;
-
-  text-rendering:
-    optimizeLegibility;
+  background: #f4f7fb;
+  color: #111827;
 }
-
-
-* {
-  box-sizing:
-    border-box;
-}
-
 
 button,
 input {
-  font:
-    inherit;
+  font: inherit;
 }
-
 
 button {
-  cursor:
-    pointer;
+  cursor: pointer;
 }
-
-
-/*
- * ========================================
- * APPLICATION SHELL
- * ========================================
- */
 
 .app-shell {
-  width:
-    100%;
+  width: 100%;
+  height: 100%;
 
-  height:
-    100vh;
-
-  display:
-    grid;
-
+  display: grid;
   grid-template-rows:
-    64px
+    78px
     minmax(0, 1fr)
-    22px;
+    28px;
 
-  overflow:
-    hidden;
-
-  background:
-    #ffffff;
+  overflow: hidden;
 }
-
-
-/*
- * ========================================
- * TOP BAR
- * ========================================
- */
 
 .topbar {
-  position:
-    relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-  z-index:
-    20;
+  gap: 18px;
+  padding: 12px 22px;
 
-  display:
-    flex;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
 
-  align-items:
-    center;
-
-  justify-content:
-    space-between;
-
-  gap:
-    24px;
-
-  padding:
-    9px
-    17px
-    9px
-    18px;
-
-  border-bottom:
-    1px solid #e2e8f0;
-
-  background:
-    #ffffff;
+  position: relative;
+  z-index: 20;
 }
-
 
 .brand {
-  min-width:
-    300px;
+  min-width: 0;
 
-  display:
-    flex;
-
-  flex-direction:
-    column;
-
-  justify-content:
-    center;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
 }
-
 
 .brand h1 {
-  margin:
-    0;
+  margin: 0;
 
-  color:
-    #0f172a;
-
-  font-size:
-    24px;
-
-  line-height:
-    26px;
-
-  font-weight:
-    760;
-
-  letter-spacing:
-    -0.45px;
+  font-size: 25px;
+  line-height: 28px;
+  font-weight: 760;
+  letter-spacing: 1px;
 }
-
 
 .product-descriptor {
-  margin-top:
-    2px;
+  color: #64748b;
 
-  color:
-    #64748b;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
 
-  font-size:
-    10px;
-
-  line-height:
-    13px;
-
-  font-weight:
-    450;
-
-  letter-spacing:
-    0.08px;
+  white-space: nowrap;
 }
-
-
-/*
- * ========================================
- * LOCATION SEARCH
- * ========================================
- */
 
 .search-group {
-  width:
-    min(
-      550px,
-      46vw
-    );
+  width: min(
+    560px,
+    48vw
+  );
 
-  display:
-    flex;
+  display: flex;
+  align-items: stretch;
 
-  align-items:
-    center;
-
-  gap:
-    8px;
+  gap: 8px;
 }
-
 
 .location-search {
-  position:
-    relative;
-
-  flex:
-    1;
+  position: relative;
+  flex: 1;
+  min-width: 0;
 }
-
 
 .location-search input {
-  width:
-    100%;
+  width: 100%;
+  min-height: 44px;
 
-  height:
-    36px;
-
-  padding:
-    0
-    11px;
+  padding: 0 14px;
 
   border:
-    1px solid #cbd5e1;
+    1px solid #d1d5db;
 
-  border-radius:
-    5px;
+  border-radius: 7px;
 
-  background:
-    #ffffff;
+  background: #f9fafb;
+  color: #0f172a;
 
-  color:
-    #0f172a;
+  font-size: 14px;
+  line-height: 20px;
 
-  font-size:
-    11px;
-
-  line-height:
-    15px;
-
-  outline:
-    none;
+  outline: none;
 }
-
 
 .location-search input:focus {
-  border-color:
-    #64748b;
-
-  box-shadow:
-    0 0 0 1px
-    rgba(
-      100,
-      116,
-      139,
-      0.08
-    );
+  border-color: #2563eb;
+  background: #ffffff;
 }
-
 
 .load-button {
-  height:
-    36px;
+  min-width: 124px;
+  min-height: 44px;
 
-  min-width:
-    102px;
+  padding: 0 16px;
 
-  padding:
-    0
-    14px;
+  border: 0;
+  border-radius: 7px;
 
-  border:
-    1px solid #0f172a;
+  background: #111827;
+  color: #ffffff;
 
-  border-radius:
-    5px;
-
-  background:
-    #0f172a;
-
-  color:
-    #ffffff;
-
-  font-size:
-    11px;
-
-  line-height:
-    14px;
-
-  font-weight:
-    650;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 650;
 }
-
 
 .search-loading {
-  position:
-    absolute;
+  position: absolute;
 
-  top:
-    10px;
+  right: 10px;
+  top: 50%;
 
-  right:
-    10px;
+  transform: translateY(-50%);
 
-  color:
-    #64748b;
+  color: #64748b;
 
-  font-size:
-    9px;
+  font-size: 9px;
 
-  pointer-events:
-    none;
+  pointer-events: none;
 }
-
 
 .location-suggestions {
-  position:
-    absolute;
+  position: absolute;
 
-  top:
-    40px;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
 
-  left:
-    0;
+  z-index: 100;
 
-  right:
-    0;
-
-  z-index:
-    100;
-
-  overflow:
-    hidden;
+  overflow: hidden;
 
   border:
-    1px solid #cbd5e1;
+    1px solid #dbe2ea;
 
-  border-radius:
-    5px;
+  border-radius: 8px;
 
-  background:
-    #ffffff;
+  background: #ffffff;
 
   box-shadow:
-    0 8px 24px
-    rgba(
-      15,
-      23,
-      42,
-      0.14
-    );
+    0 12px 30px
+    rgba(15, 23, 42, 0.14);
 }
-
 
 .location-suggestion {
-  width:
-    100%;
+  width: 100%;
 
-  display:
-    flex;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
 
-  flex-direction:
-    column;
+  border: 0;
+  border-bottom: 1px solid #eef2f7;
+  border-radius: 0;
 
-  align-items:
-    flex-start;
+  padding: 10px 12px;
 
-  gap:
-    2px;
+  background: #ffffff;
+  color: #111827;
 
-  padding:
-    9px
-    11px;
-
-  border:
-    0;
-
-  border-bottom:
-    1px solid #eef2f7;
-
-  background:
-    #ffffff;
-
-  text-align:
-    left;
+  text-align: left;
 }
-
 
 .location-suggestion:last-child {
-  border-bottom:
-    0;
+  border-bottom: 0;
 }
-
 
 .location-suggestion:hover,
 .location-suggestion.highlighted {
-  background:
-    #f1f5f9;
+  background: #f1f5f9;
 }
-
 
 .suggestion-name {
-  color:
-    #0f172a;
+  overflow: hidden;
 
-  font-size:
-    10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
-  line-height:
-    14px;
-
-  font-weight:
-    550;
+  font-size: 11px;
+  font-weight: 600;
 }
-
 
 .suggestion-type {
-  color:
-    #64748b;
+  flex-shrink: 0;
 
-  font-size:
-    8px;
+  padding: 2px 6px;
 
-  line-height:
-    11px;
+  border-radius: 999px;
 
-  text-transform:
-    capitalize;
+  background: #f1f5f9;
+  color: #64748b;
+
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
-
-
-/*
- * ========================================
- * MAIN THREE-COLUMN LAYOUT
- * ========================================
- */
 
 .workspace {
-  min-height:
-    0;
+  min-height: 0;
 
-  display:
-    grid;
-
-  /*
-   * Deliberately wider than the new
-   * first-principles UI.
-   *
-   * This restores the visual balance
-   * of the earlier application.
-   */
+  display: grid;
   grid-template-columns:
-    215px
+    235px
     minmax(0, 1fr)
-    205px;
+    220px;
 }
-
 
 .sidebar,
 .telemetry {
-  min-height:
-    0;
+  min-height: 0;
 
-  overflow-y:
-    auto;
+  overflow-y: auto;
+
+  padding: 20px;
 
   background:
-    #ffffff;
+    rgba(255, 255, 255, 0.97);
 
-  scrollbar-width:
-    thin;
+  scrollbar-width: thin;
 }
-
 
 .sidebar {
-  border-right:
-    1px solid #e2e8f0;
+  border-right: 1px solid #e5e7eb;
 }
-
 
 .telemetry {
-  padding-top:
-    17px;
-
-  border-left:
-    1px solid #e2e8f0;
+  border-left: 1px solid #e5e7eb;
 }
-
-
-/*
- * ========================================
- * SIDEBAR SECTIONS
- * ========================================
- */
 
 .sidebar section {
-  padding:
-    18px
-    14px;
-
-  border-bottom:
-    1px solid #edf1f5;
+  margin-bottom: 28px;
 }
 
+.sidebar section:last-child {
+  margin-bottom: 0;
+}
 
 .section-label {
-  display:
-    block;
+  display: block;
 
-  margin-bottom:
-    11px;
+  margin-bottom: 0;
 
-  color:
-    #475569;
+  color: #64748b;
 
-  font-size:
-    9px;
-
-  line-height:
-    11px;
-
-  font-weight:
-    800;
-
-  letter-spacing:
-    1.25px;
+  font-size: 10px;
+  line-height: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
 }
-
-
-.telemetry >
-.section-label {
-  padding:
-    0
-    15px;
-}
-
 
 .section-label.baseline {
-  margin-top:
-    20px;
+  margin-top: 28px;
 }
-
 
 .location-name {
-  display:
-    block;
+  display: block;
 
-  color:
-    #0f172a;
+  margin-top: 7px;
 
-  font-size:
-    11px;
+  color: #111827;
 
-  line-height:
-    15px;
-
-  font-weight:
-    720;
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 750;
 }
-
 
 .status {
-  margin:
-    8px
-    0
-    0;
+  margin: 8px 0 0;
 
-  color:
-    #64748b;
+  color: #64748b;
 
-  font-size:
-    9px;
-
-  line-height:
-    13px;
-
-  font-weight:
-    430;
+  font-size: 11px;
+  line-height: 1.5;
 }
-
-
-/*
- * ========================================
- * SIMULATION CONTROLS
- * ========================================
- */
 
 .control-label {
-  display:
-    flex;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-  align-items:
-    center;
+  gap: 8px;
 
-  justify-content:
-    space-between;
+  margin: 10px 0 8px;
 
-  gap:
-    10px;
-
-  margin-bottom:
-    9px;
-
-  color:
-    #334155;
-
-  font-size:
-    10px;
-
-  line-height:
-    14px;
+  color: #475569;
+  font-size: 12px;
 }
-
 
 .control-label strong {
-  color:
-    #0f172a;
+  margin: 0;
 
-  font-size:
-    11px;
-
-  line-height:
-    14px;
-
-  font-weight:
-    700;
+  color: #111827;
+  font-size: 12px;
 }
-
 
 .range-control {
-  width:
-    100%;
-
-  height:
-    18px;
-
-  accent-color:
-    #2563eb;
+  width: 100%;
+  accent-color: #2563eb;
 }
-
 
 .simulation-button {
-  width:
-    100%;
+  width: 100%;
 
-  height:
-    36px;
+  margin-top: 12px;
+  padding: 10px 15px;
 
-  margin-top:
-    12px;
+  border: 0;
+  border-radius: 7px;
 
-  border:
-    0;
+  background: #2563eb;
+  color: #ffffff;
 
-  border-radius:
-    5px;
-
-  background:
-    #2563eb;
-
-  color:
-    #ffffff;
-
-  font-size:
-    11px;
-
-  line-height:
-    14px;
-
-  font-weight:
-    650;
+  font-size: 11px;
+  font-weight: 650;
 }
-
-
-.simulation-button:hover {
-  background:
-    #1d4ed8;
-}
-
 
 .comparison-toggle {
-  display:
-    flex;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 
-  align-items:
-    center;
+  gap: 8px;
 
-  gap:
-    7px;
+  margin: 14px 0 0;
 
-  margin-top:
-    16px;
+  color: #334155;
 
-  color:
-    #334155;
+  font-size: 11px;
+  font-weight: 600;
 
-  font-size:
-    10px;
-
-  line-height:
-    14px;
+  cursor: pointer;
 }
-
 
 .comparison-toggle input {
-  margin:
-    0;
-}
+  width: auto;
+  margin: 0;
 
+  cursor: pointer;
+}
 
 .small-note {
-  margin:
-    8px
-    0
-    0;
+  margin: 7px 0 0;
 
-  color:
-    #64748b;
+  color: #64748b;
 
-  font-size:
-    8.5px;
+  font-size: 9px;
+  line-height: 1.45;
 
-  line-height:
-    13px;
-
-  text-align:
-    center;
+  text-align: center;
 }
-
 
 .small-note.left {
-  text-align:
-    left;
+  text-align: left;
 }
-
-
-/*
- * ========================================
- * ROAD INSPECTOR
- * ========================================
- */
 
 .road-inspector {
-  display:
-    flex;
+  margin-top: 10px;
+  padding: 12px;
 
-  flex-direction:
-    column;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 
-  gap:
-    5px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
 
-  color:
-    #64748b;
+  background: #f8fafc;
 
-  font-size:
-    9.5px;
+  color: #64748b;
 
-  line-height:
-    14px;
+  font-size: 11px;
+  line-height: 1.45;
 }
-
 
 .road-inspector strong {
-  margin-bottom:
-    1px;
+  margin: 0 0 4px;
 
-  color:
-    #0f172a;
+  color: #111827;
 
-  font-size:
-    12px;
-
-  line-height:
-    16px;
-
-  font-weight:
-    720;
+  font-size: 13px;
+  line-height: 1.4;
 }
-
 
 .close-road-button,
 .open-road-button,
 .reset-button {
-  width:
-    100%;
+  width: 100%;
 
-  min-height:
-    32px;
+  margin-top: 12px;
+  padding: 9px 10px;
 
-  margin-top:
-    9px;
+  border: 0;
+  border-radius: 6px;
 
-  border-radius:
-    5px;
-
-  font-size:
-    10px;
-
-  line-height:
-    13px;
-
-  font-weight:
-    650;
+  font-size: 11px;
+  font-weight: 700;
 }
-
 
 .close-road-button {
-  border:
-    1px solid #b91c1c;
-
-  background:
-    #b91c1c;
-
-  color:
-    #ffffff;
+  background: #991b1b;
+  color: #ffffff;
 }
-
-
-.close-road-button:hover {
-  background:
-    #991b1b;
-}
-
 
 .open-road-button {
-  border:
-    1px solid #15803d;
-
-  background:
-    #15803d;
-
-  color:
-    #ffffff;
+  background: #15803d;
+  color: #ffffff;
 }
-
-
-.open-road-button:hover {
-  background:
-    #166534;
-}
-
 
 .reset-button {
-  border:
-    1px solid #cbd5e1;
-
-  background:
-    #f1f5f9;
-
-  color:
-    #334155;
+  background: #e2e8f0;
+  color: #334155;
 }
-
-
-.reset-button:hover {
-  background:
-    #e2e8f0;
-}
-
-
-/*
- * ========================================
- * CLOSED ROAD LIST
- * ========================================
- */
 
 .closed-roads {
-  margin-top:
-    16px;
-}
+  margin-top: 18px;
+  padding-top: 14px;
 
+  border-top: 1px solid #e2e8f0;
+}
 
 .closed-roads-header {
-  min-height:
-    22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-  display:
-    flex;
+  margin-bottom: 8px;
 
-  align-items:
-    center;
+  color: #64748b;
 
-  justify-content:
-    space-between;
-
-  margin-bottom:
-    7px;
-
-  color:
-    #475569;
-
-  font-size:
-    8px;
-
-  line-height:
-    10px;
-
-  font-weight:
-    800;
-
-  letter-spacing:
-    1px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
 }
 
-
-/*
- * Small pale-red count badge.
- *
- * This restores the visual treatment
- * from the previous UI without adding
- * any application behavior.
- */
 .closed-roads-header strong {
-  min-width:
-    20px;
+  margin: 0;
+  padding: 2px 6px;
 
-  height:
-    20px;
+  border-radius: 10px;
 
-  display:
-    inline-flex;
+  background: #fee2e2;
+  color: #991b1b;
 
-  align-items:
-    center;
-
-  justify-content:
-    center;
-
-  padding:
-    0
-    6px;
-
-  border:
-    1px solid #fecaca;
-
-  border-radius:
-    999px;
-
-  background:
-    #fef2f2;
-
-  color:
-    #dc2626;
-
-  font-size:
-    9px;
-
-  line-height:
-    1;
-
-  font-weight:
-    750;
+  font-size: 10px;
 }
-
 
 .closed-road-item {
-  min-height:
-    39px;
+  display: flex;
+  align-items: stretch;
 
-  display:
-    grid;
+  margin-bottom: 6px;
 
-  grid-template-columns:
-    minmax(0, 1fr)
-    auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
 
-  align-items:
-    center;
+  overflow: hidden;
 
-  gap:
-    7px;
-
-  margin-bottom:
-    5px;
-
-  padding:
-    5px;
-
-  border:
-    1px solid #e2e8f0;
-
-  border-radius:
-    4px;
-
-  background:
-    #ffffff;
-
-  transition:
-    border-color 120ms ease,
-    background 120ms ease;
+  background: #ffffff;
 }
-
-
-.closed-road-item:hover {
-  border-color:
-    #bfdbfe;
-}
-
 
 .closed-road-item.selected {
-  border-color:
-    #60a5fa;
-
-  background:
-    #f8fbff;
+  border-color: #2563eb;
 }
-
 
 .closed-road-select {
-  min-width:
-    0;
+  flex: 1;
+  min-width: 0;
 
-  overflow:
-    hidden;
+  border: 0;
 
-  padding:
-    2px
-    3px;
+  padding: 8px;
 
-  border:
-    0;
+  overflow: hidden;
 
-  background:
-    transparent;
+  background: transparent;
+  color: #334155;
 
-  color:
-    #334155;
+  font-size: 10px;
+  font-weight: 650;
 
-  font-size:
-    9px;
-
-  line-height:
-    13px;
-
-  font-weight:
-    620;
-
-  text-align:
-    left;
-
-  text-overflow:
-    ellipsis;
-
-  white-space:
-    nowrap;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-
 
 .closed-road-reopen {
-  min-height:
-    26px;
+  border: 0;
+  border-left: 1px solid #e2e8f0;
 
-  padding:
-    0
-    8px;
+  padding: 0 8px;
 
-  border:
-    1px solid #fecaca;
+  background: #fff7f7;
+  color: #991b1b;
 
-  border-radius:
-    4px;
-
-  background:
-    #fff7f7;
-
-  color:
-    #dc2626;
-
-  font-size:
-    8px;
-
-  line-height:
-    11px;
-
-  font-weight:
-    650;
+  font-size: 9px;
+  font-weight: 700;
 }
-
 
 .closed-road-reopen:hover {
-  border-color:
-    #fca5a5;
-
-  background:
-    #fef2f2;
+  background: #fee2e2;
 }
-
-
-/*
- * ========================================
- * ROAD HEATMAP LEGEND
- * ========================================
- */
 
 .legend-row {
-  display:
-    flex;
+  display: flex;
+  align-items: center;
 
-  align-items:
-    center;
+  gap: 8px;
 
-  gap:
-    8px;
+  margin-top: 9px;
 
-  margin:
-    8px
-    0;
-
-  color:
-    #334155;
-
-  font-size:
-    10px;
-
-  line-height:
-    13px;
+  color: #334155;
+  font-size: 12px;
 }
-
 
 .line-key {
-  width:
-    17px;
+  width: 18px;
+  height: 4px;
 
-  height:
-    3px;
+  flex: 0 0 auto;
 
-  flex:
-    0 0 auto;
-
-  border-radius:
-    3px;
+  border-radius: 3px;
 }
-
 
 .line-key.free {
-  background:
-    #22c55e;
+  background: #22c55e;
 }
-
 
 .line-key.slow {
-  background:
-    #f59e0b;
+  background: #f59e0b;
 }
-
 
 .line-key.congested {
-  background:
-    #ef4444;
+  background: #ef4444;
 }
-
 
 .line-key.closed {
-  background:
-    #7f1d1d;
+  background: #7f1d1d;
 }
-
 
 .data-note {
-  color:
-    #64748b;
+  padding-top: 16px;
 
-  font-size:
-    8.5px;
+  border-top: 1px solid #e5e7eb;
 
-  line-height:
-    13px;
+  color: #64748b;
+
+  font-size: 10px;
+  line-height: 1.5;
 }
-
-
-/*
- * ========================================
- * MAP
- * ========================================
- */
 
 .map-panel {
-  min-width:
-    0;
+  min-width: 0;
+  min-height: 0;
 
-  min-height:
-    0;
+  position: relative;
+  overflow: hidden;
 
-  position:
-    relative;
-
-  overflow:
-    hidden;
-
-  background:
-    #e2e8f0;
+  background: #e2e8f0;
 }
 
-
-/*
- * Keep this explicit.
- *
- * This is the sizing fix that allowed
- * MapLibre to render correctly.
- */
 .traffic-map {
-  width:
-    100%;
-
-  height:
-    100%;
+  width: 100%;
+  height: 100%;
 }
 
-
-/*
- * ========================================
- * RIGHT TELEMETRY
- * ========================================
- */
+.telemetry > .section-label {
+  margin-bottom: 6px;
+}
 
 .metric {
-  padding:
-    12px
-    15px
-    13px;
+  padding: 13px 0;
 
-  border-bottom:
-    1px solid #edf1f5;
+  border-bottom: 1px solid #eef2f7;
 }
-
 
 .metric span {
-  display:
-    block;
+  display: block;
 
-  margin-bottom:
-    5px;
+  margin-bottom: 4px;
 
-  color:
-    #64748b;
+  color: #64748b;
 
-  font-size:
-    9px;
-
-  line-height:
-    11px;
-
-  font-weight:
-    450;
+  font-size: 11px;
+  line-height: 14px;
 }
-
 
 .metric strong {
-  display:
-    block;
+  display: block;
 
-  color:
-    #0f172a;
+  color: #111827;
 
-  font-size:
-    16px;
-
-  line-height:
-    19px;
-
-  font-weight:
-    760;
-
-  letter-spacing:
-    -0.2px;
+  font-size: 19px;
+  line-height: 22px;
+  font-weight: 750;
+  letter-spacing: -0.4px;
 }
-
 
 .metric-emphasis strong {
-  font-size:
-    19px;
-
-  line-height:
-    22px;
+  font-size: 22px;
+  line-height: 25px;
 }
-
 
 .metric-note {
-  margin:
-    19px
-    15px
-    0;
+  margin-top: 28px;
+  padding-top: 12px;
 
-  padding-top:
-    11px;
+  border-top: 1px solid #e2e8f0;
 
-  border-top:
-    1px solid #e2e8f0;
-
-  color:
-    #64748b;
+  color: #64748b;
 }
-
 
 .metric-note strong {
-  display:
-    block;
+  display: block;
 
-  margin-bottom:
-    5px;
+  margin-bottom: 6px;
 
-  color:
-    #334155;
+  color: #334155;
 
-  font-size:
-    8px;
-
-  line-height:
-    10px;
-
-  font-weight:
-    800;
-
-  letter-spacing:
-    0.9px;
-
-  text-transform:
-    uppercase;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
-
 
 .metric-note p {
-  margin:
-    0;
+  margin: 0;
 
-  font-size:
-    8.5px;
-
-  line-height:
-    13px;
+  font-size: 10px;
+  line-height: 1.5;
 }
-
-
-/*
- * ========================================
- * FOOTER
- * ========================================
- */
 
 footer {
-  display:
-    flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  align-items:
-    center;
+  padding: 0 8px;
 
-  padding:
-    0
-    10px;
+  border-top: 1px solid #e5e7eb;
 
-  border-top:
-    1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
 
-  background:
-    #ffffff;
-
-  color:
-    #64748b;
-
-  font-size:
-    8px;
-
-  line-height:
-    10px;
+  font-size: 9px;
 }
-
 
 .maplibregl-ctrl-attrib {
-  font-size:
-    8px !important;
+  font-size: 8px !important;
 }
 
-
-/*
- * ========================================
- * RESPONSIVE
- * ========================================
- */
-
-@media (
-  max-width: 1050px
-) {
-
+@media (max-width: 1000px) {
   .workspace {
     grid-template-columns:
-      195px
+      210px
       minmax(0, 1fr);
   }
 
-
   .telemetry {
-    display:
-      none;
+    display: none;
   }
 
-
   .search-group {
-    width:
-      min(
-        440px,
-        50vw
-      );
+    width: min(460px, 52vw);
   }
 }

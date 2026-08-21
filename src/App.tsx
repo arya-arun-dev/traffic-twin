@@ -1619,12 +1619,10 @@ function App() {
                             road.segmentKey
                           }
                           className={
-                            selectedRoad
-                              ?.segmentKey
+                            selectedRoad?.segmentKey
                             === road.segmentKey
-
-                            ? 'closed-road-item selected'
-                            : 'closed-road-item'
+                              ? 'closed-road-item selected'
+                              : 'closed-road-item'
                           }
                         >
 
@@ -1719,17 +1717,17 @@ function App() {
 
             <div className="legend-row">
               <span className="line-key free" />
-              Free flow
+              Near free flow
             </div>
 
             <div className="legend-row">
               <span className="line-key slow" />
-              Slowing
+              Slower
             </div>
 
             <div className="legend-row">
               <span className="line-key congested" />
-              Congested
+              Very slow
             </div>
 
             <div className="legend-row">
