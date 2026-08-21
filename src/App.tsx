@@ -43,25 +43,20 @@ import type {
   RoadMetadataIndex,
 } from './application/roadMetadata';
 
-import {
-  buildRoadSpeedViews,
-  buildVehicleViews,
-  VehicleIdentityRegistry,
-} from './application/viewModels';
-
 import type {
   RoadSelection,
   RoadSpeedView,
   VehicleView,
 } from './application/viewModels';
 
-import {
-  ScenarioExperiment,
-} from './scenario/ScenarioExperiment';
-
 import type {
   ScenarioMetrics,
 } from './scenario/ScenarioExperiment';
+
+import type {
+  SimulationWorkerCommand,
+  SimulationWorkerResponse,
+} from './worker/simulationProtocol.ts';
 
 
 const DEFAULT_LATITUDE =
@@ -78,25 +73,6 @@ const ROAD_RADIUS_METERS =
 
 const DEFAULT_VEHICLE_COUNT =
   500;
-
-/*
- * Fixed model timestep.
- *
- * This is intentionally not a UI control. Changing dt changes the
- * numerical experiment and belongs in deliberate model validation,
- * not casual dashboard interaction.
- */
-const FIXED_STEP_SECONDS =
-  0.05;
-
-const SNAPSHOT_INTERVAL_MS =
-  66;
-
-const ROAD_TELEMETRY_INTERVAL_MS =
-  250;
-
-const MAX_CATCH_UP_STEPS =
-  5;
 
 const EXPERIMENT_SEED =
   20260821;
@@ -120,6 +96,19 @@ function countDirectedEdges(
 
   return count;
 }
+
+
+type PendingSimulationStatus =
+  | {
+      experimentId: number;
+      kind: 'LOAD';
+      nodeCount: number;
+      directedEdgeCount: number;
+    }
+  | {
+      experimentId: number;
+      kind: 'RESTART';
+    };
 
 
 function App() {
@@ -307,22 +296,30 @@ function App() {
     );
 
 
-  const experimentRef =
+  const simulationWorkerRef =
     useRef<
-      ScenarioExperiment
+      Worker
       | null
     >(
       null
     );
 
-  const vehicleIdentityRef =
+  const currentExperimentIdRef =
     useRef(
-      new VehicleIdentityRegistry()
+      0
     );
 
   const runningRef =
     useRef(
       running
+    );
+
+  const pendingSimulationStatusRef =
+    useRef<
+      PendingSimulationStatus
+      | null
+    >(
+      null
     );
 
   const suppressAutocompleteRef =
@@ -339,63 +336,222 @@ function App() {
   }, [running]);
 
 
-  function publishSimulationView() {
+  useEffect(() => {
 
-    const experiment =
-      experimentRef.current;
+    const worker =
+      new Worker(
+        new URL(
+          './worker/simulation.worker.ts',
+          import.meta.url
+        ),
+        {
+          type: 'module',
+        }
+      );
 
-    if (!experiment) {
-      return;
+
+    simulationWorkerRef.current =
+      worker;
+
+
+    worker.onmessage =
+      (
+        event:
+          MessageEvent<SimulationWorkerResponse>
+      ) => {
+
+        const message =
+          event.data;
+
+
+        if (
+          message.experimentId
+          !== null
+          &&
+          message.experimentId
+          !== currentExperimentIdRef.current
+        ) {
+          return;
+        }
+
+
+        switch (
+          message.type
+        ) {
+
+          case 'STATE': {
+
+            setVehicles(
+              message.vehicles
+            );
+
+            setScenarioMetrics(
+              message.scenarioMetrics
+            );
+
+            setBaselineMetrics(
+              message.baselineMetrics
+            );
+
+
+            const pending =
+              pendingSimulationStatusRef.current;
+
+
+            if (
+              pending
+              &&
+              pending.experimentId
+              === message.experimentId
+            ) {
+
+              if (
+                pending.kind
+                === 'LOAD'
+              ) {
+
+                setStatus(
+                  `Loaded `
+                  + `${pending.nodeCount.toLocaleString()} nodes, `
+                  + `${pending.directedEdgeCount.toLocaleString()} directed edges. `
+                  + `${message.initialVehicleCount.toLocaleString()} seeded agents initialized.`
+                );
+
+              } else {
+
+                setStatus(
+                  `Experiment restarted with `
+                  + `${message.initialVehicleCount.toLocaleString()} `
+                  + `deterministically seeded agents.`
+                );
+              }
+
+
+              pendingSimulationStatusRef.current =
+                null;
+            }
+
+            return;
+          }
+
+
+          case 'ROAD_SPEEDS':
+
+            setRoadSpeeds(
+              message.roadSpeeds
+            );
+
+            return;
+
+
+          case 'COMPLETE':
+
+            runningRef.current =
+              false;
+
+            setRunning(
+              false
+            );
+
+            return;
+
+
+          case 'ERROR':
+
+            console.error(
+              message.message
+            );
+
+            pendingSimulationStatusRef.current =
+              null;
+
+            runningRef.current =
+              false;
+
+            setRunning(
+              false
+            );
+
+            setStatus(
+              message.message
+            );
+
+            return;
+        }
+      };
+
+
+    worker.onerror =
+      event => {
+
+        console.error(
+          event
+        );
+
+        pendingSimulationStatusRef.current =
+          null;
+
+        runningRef.current =
+          false;
+
+        setRunning(
+          false
+        );
+
+        setStatus(
+          'Simulation worker failed.'
+        );
+      };
+
+
+    return () => {
+
+      worker.terminate();
+
+
+      if (
+        simulationWorkerRef.current
+        === worker
+      ) {
+
+        simulationWorkerRef.current =
+          null;
+      }
+    };
+
+  }, []);
+
+
+  function postSimulationCommand(
+    command: SimulationWorkerCommand
+  ): boolean {
+
+    const worker =
+      simulationWorkerRef.current;
+
+
+    if (!worker) {
+
+      runningRef.current =
+        false;
+
+      setRunning(
+        false
+      );
+
+      setStatus(
+        'Simulation worker is not ready.'
+      );
+
+      return false;
     }
 
 
-    const scenarioGraph =
-      experiment
-        .getScenarioGraph();
-
-    const occupancy =
-      experiment
-        .getScenarioOccupancy();
-
-
-    setVehicles(
-      buildVehicleViews(
-        scenarioGraph,
-        occupancy,
-        vehicleIdentityRef.current
-      )
+    worker.postMessage(
+      command
     );
 
-
-    setScenarioMetrics(
-      experiment
-        .getScenarioMetrics()
-    );
-
-
-    setBaselineMetrics(
-      experiment
-        .getBaselineMetrics()
-    );
-  }
-
-
-  function publishRoadTelemetry() {
-
-    const experiment =
-      experimentRef.current;
-
-    if (!experiment) {
-      return;
-    }
-
-
-    setRoadSpeeds(
-      buildRoadSpeedViews(
-        experiment
-          .getScenarioOccupancy()
-      )
-    );
+    return true;
   }
 
 
@@ -406,35 +562,87 @@ function App() {
     requestedVehicleCount:
       number,
     compare:
-      boolean
-  ) {
+      boolean,
+    startRunning:
+      boolean = true
+  ): number | null {
 
-    const experiment =
-      new ScenarioExperiment(
-        targetGraph,
-        new Set(
-          closures
-        ),
+    const experimentId =
+      currentExperimentIdRef.current
+      + 1;
+
+
+    const posted =
+      postSimulationCommand({
+        type: 'INITIALIZE',
+        experimentId,
+        graph:
+          targetGraph,
+        closedSegmentKeys:
+          closures,
         requestedVehicleCount,
-        EXPERIMENT_SEED,
-        compare
-      );
+        seed:
+          EXPERIMENT_SEED,
+        comparisonEnabled:
+          compare,
+        running:
+          startRunning,
+      });
 
 
-    experimentRef.current =
-      experiment;
-
-    vehicleIdentityRef.current =
-      new VehicleIdentityRegistry();
+    if (!posted) {
+      return null;
+    }
 
 
-    publishSimulationView();
+    currentExperimentIdRef.current =
+      experimentId;
 
-    publishRoadTelemetry();
+
+    return experimentId;
+  }
 
 
-    return experiment
-      .initialVehicleCount;
+  function resetExperiment(
+    closures:
+      string[],
+    requestedVehicleCount:
+      number,
+    compare:
+      boolean
+  ): number | null {
+
+    const experimentId =
+      currentExperimentIdRef.current
+      + 1;
+
+
+    const posted =
+      postSimulationCommand({
+        type: 'RESET',
+        experimentId,
+        closedSegmentKeys:
+          closures,
+        requestedVehicleCount,
+        seed:
+          EXPERIMENT_SEED,
+        comparisonEnabled:
+          compare,
+        running:
+          true,
+      });
+
+
+    if (!posted) {
+      return null;
+    }
+
+
+    currentExperimentIdRef.current =
+      experimentId;
+
+
+    return experimentId;
   }
 
 
@@ -538,7 +746,7 @@ function App() {
       );
 
 
-      const initializedVehicles =
+      const experimentId =
         initializeExperiment(
           nextGraph,
           [],
@@ -547,16 +755,31 @@ function App() {
         );
 
 
+      if (
+        experimentId
+        === null
+      ) {
+        return;
+      }
+
+
+      pendingSimulationStatusRef.current = {
+        experimentId,
+        kind: 'LOAD',
+        nodeCount:
+          nextGraph.nodes.size,
+        directedEdgeCount:
+          countDirectedEdges(
+            nextGraph
+          ),
+      };
+
+
+      runningRef.current =
+        true;
+
       setRunning(
         true
-      );
-
-
-      setStatus(
-        `Loaded `
-        + `${nextGraph.nodes.size.toLocaleString()} nodes, `
-        + `${countDirectedEdges(nextGraph).toLocaleString()} directed edges. `
-        + `${initializedVehicles.toLocaleString()} seeded agents initialized.`
       );
 
     } catch (error) {
@@ -625,21 +848,34 @@ function App() {
         );
 
 
-        const initializedVehicles =
+        const experimentId =
           initializeExperiment(
             nextGraph,
             [],
             DEFAULT_VEHICLE_COUNT,
-            false
+            false,
+            runningRef.current
           );
 
 
-        setStatus(
-          `Loaded `
-          + `${nextGraph.nodes.size.toLocaleString()} nodes, `
-          + `${countDirectedEdges(nextGraph).toLocaleString()} directed edges. `
-          + `${initializedVehicles.toLocaleString()} seeded agents initialized.`
-        );
+        if (
+          experimentId
+          === null
+        ) {
+          return;
+        }
+
+
+        pendingSimulationStatusRef.current = {
+          experimentId,
+          kind: 'LOAD',
+          nodeCount:
+            nextGraph.nodes.size,
+          directedEdgeCount:
+            countDirectedEdges(
+              nextGraph
+            ),
+        };
 
       } catch (error) {
 
@@ -795,168 +1031,6 @@ function App() {
   }, [query]);
 
 
-  /*
-   * Browser scheduling is intentionally outside the deterministic
-   * scenario/timestep code. The model always receives FIXED_STEP_SECONDS.
-   */
-  useEffect(() => {
-
-    let frameId =
-      0;
-
-    let previousTime =
-      performance.now();
-
-    let accumulatorSeconds =
-      0;
-
-    let lastSnapshotTime =
-      previousTime;
-
-    let lastTelemetryTime =
-      previousTime;
-
-
-    function frame(
-      now: number
-    ) {
-
-      const elapsedSeconds =
-        Math.min(
-          0.25,
-
-          Math.max(
-            0,
-            (
-              now
-              - previousTime
-            )
-            / 1000
-          )
-        );
-
-
-      previousTime =
-        now;
-
-
-      const experiment =
-        experimentRef.current;
-
-
-      if (
-        runningRef.current
-        &&
-        experiment
-      ) {
-
-        accumulatorSeconds +=
-          elapsedSeconds;
-
-
-        let catchUpSteps =
-          0;
-
-
-        while (
-          accumulatorSeconds
-          >= FIXED_STEP_SECONDS
-          &&
-          catchUpSteps
-          < MAX_CATCH_UP_STEPS
-        ) {
-
-          experiment.step(
-            FIXED_STEP_SECONDS
-          );
-
-          accumulatorSeconds -=
-            FIXED_STEP_SECONDS;
-
-          catchUpSteps++;
-        }
-
-
-        /*
-         * Runtime protection only.
-         *
-         * If the browser stalls for a long time, do not try to execute
-         * an unbounded backlog of physics steps on the UI thread.
-         */
-        if (
-          catchUpSteps
-          === MAX_CATCH_UP_STEPS
-          &&
-          accumulatorSeconds
-          >= FIXED_STEP_SECONDS
-        ) {
-
-          accumulatorSeconds =
-            0;
-        }
-
-
-        if (
-          experiment.isComplete()
-        ) {
-
-          runningRef.current =
-            false;
-
-          setRunning(
-            false
-          );
-        }
-      }
-
-
-      if (
-        now
-        - lastSnapshotTime
-        >= SNAPSHOT_INTERVAL_MS
-      ) {
-
-        publishSimulationView();
-
-        lastSnapshotTime =
-          now;
-      }
-
-
-      if (
-        now
-        - lastTelemetryTime
-        >= ROAD_TELEMETRY_INTERVAL_MS
-      ) {
-
-        publishRoadTelemetry();
-
-        lastTelemetryTime =
-          now;
-      }
-
-
-      frameId =
-        requestAnimationFrame(
-          frame
-        );
-    }
-
-
-    frameId =
-      requestAnimationFrame(
-        frame
-      );
-
-
-    return () => {
-
-      cancelAnimationFrame(
-        frameId
-      );
-    };
-
-  }, []);
 
 
   function restartExperiment(
@@ -973,24 +1047,33 @@ function App() {
     }
 
 
-    const initializedVehicles =
-      initializeExperiment(
-        graph,
+    const experimentId =
+      resetExperiment(
         nextClosures,
         nextVehicleCount,
         nextComparison
       );
 
 
+    if (
+      experimentId
+      === null
+    ) {
+      return;
+    }
+
+
+    pendingSimulationStatusRef.current = {
+      experimentId,
+      kind: 'RESTART',
+    };
+
+
+    runningRef.current =
+      true;
+
     setRunning(
       true
-    );
-
-
-    setStatus(
-      `Experiment restarted with `
-      + `${initializedVehicles.toLocaleString()} `
-      + `deterministically seeded agents.`
     );
   }
 
@@ -1474,13 +1557,21 @@ function App() {
                     !running;
 
 
+                  runningRef.current =
+                    nextRunning;
+
                   setRunning(
                     nextRunning
                   );
 
 
-                  runningRef.current =
-                    nextRunning;
+                  postSimulationCommand({
+                    type: 'SET_RUNNING',
+                    experimentId:
+                      currentExperimentIdRef.current,
+                    running:
+                      nextRunning,
+                  });
                 }
               }
             >
