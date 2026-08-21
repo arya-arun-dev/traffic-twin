@@ -8,26 +8,8 @@
 
 The application is structured into decoupled domain models, data ingestion, scenario management, and UI visualization components.
 
-src/
-├── model/                  # Physics & Agent Core Engine
-│   ├── graph.ts            # Road network graph (nodes, edges, geometry)
-│   ├── idm.ts              # Intelligent Driver Model car-following math
-│   ├── routing.ts          # Pathfinding algorithms (A*, Dijkstra)
-│   ├── simulation.ts       # Time-step engine & multi-agent updates
-│   └── types.ts            # Shared domain type definitions
-├── data/                   # Network Ingestion & Geocoding
-│   ├── osm.ts              # OpenStreetMap Overpass API client & parser
-│   ├── geocoding.ts        # Nominatim location/coordinate lookup
-│   └── roadNetworkLoader.ts# Raw OSM to graph representation converter
-├── application/            # ViewModels & Application Logic
-│   ├── roadIdentity.ts     # Edge/junction identification & hashing
-│   ├── roadMetadata.ts     # Way tagging, speed limits, lane extraction
-│   └── viewModels.ts       # UI state projection adapters
-├── scenario/               # Traffic Interventions & Experiments
-│   ├── ScenarioExperiment.ts # Comparative simulation lifecycle manager
-│   └── interventions.ts    # Road closure, signal, & capacity modifiers
-└── components/             # Rendering
-└── TrafficMap.tsx      # Map Canvas/Leaflet vehicle & network renderer
+<img width="589" height="491" alt="image" src="https://github.com/user-attachments/assets/49d8464c-6231-489f-bc80-6121304b2f3e" />
+
 
 ---
 
