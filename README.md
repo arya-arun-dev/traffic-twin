@@ -1,32 +1,49 @@
-# React + TypeScript + Vite
+# TrafficTwin
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+**Urban Traffic Digital Twin & Intervention Simulator**
 
-Currently, two official plugins are available:
+TrafficTwin is a browser-based microscopic traffic simulation platform for exploring how changes to a real road network affect vehicle movement and network throughput.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The application loads real roads and intersections from OpenStreetMap, converts them into a directed road graph, assigns routes with A*, and simulates individual vehicle motion using the Intelligent Driver Model (IDM). Users can interact with the network through a map interface, close road segments, compare an intervention against a baseline scenario, and observe the resulting traffic behavior.
 
-## React Compiler
+TrafficTwin is intentionally built around a **first-principles simulation core** rather than around the visualization layer. The traffic model can operate independently of React, MapLibre, or any browser-specific functionality.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+> **Current model status:** Road geometry is based on real OpenStreetMap data, but traffic demand is synthetic. TrafficTwin should therefore be treated as a simulation and experimentation platform rather than a calibrated representation of current real-world traffic conditions.
 
-## Expanding the Oxlint configuration
+---
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## Overview
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+TrafficTwin models traffic at the individual-vehicle level.
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+At a high level:
+
+```text
+OpenStreetMap
+      │
+      ▼
+Directed Road Graph
+      │
+      ▼
+Synthetic Origin / Destination Demand
+      │
+      ▼
+A* Route Assignment
+      │
+      ▼
+Microscopic Vehicle Simulation
+      │
+      ├── Intelligent Driver Model
+      ├── Hard vehicle spacing
+      ├── Junction movement requests
+      ├── Junction permissions
+      └── Downstream entry safety
+      │
+      ▼
+Scenario Metrics
+      │
+      ▼
+Application Projection
+      │
+      ▼
+React + MapLibre Visualization
