@@ -1,6 +1,6 @@
 # Traffic Twin
 
-**Traffic Twin** is a full-stack digital twin traffic simulation engine and visualization system modeling multi-agent urban traffic flow, path routing, driver behavior, and scenario experiments directly in the browser and via distributed backend services.
+**Traffic Twin** is a full-stack digital twin traffic simulation engine and visualization system modeling multi-agent traffic flow, path routing, driver behavior, and scenario experiments directly in the browser and via distributed backend services.
 
 **Live Demo:** [diligent-fascination-production-e858.up.railway.app](https://diligent-fascination-production-e858.up.railway.app)
 
