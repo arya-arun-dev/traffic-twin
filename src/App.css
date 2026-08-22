@@ -710,3 +710,47 @@ footer {
     width: min(460px, 52vw);
   }
 }
+.seed-control-label {
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+
+.numeric-control {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 8px 9px;
+
+  border: 1px solid #dbe2ea;
+  border-radius: 7px;
+
+  background: #f9fafb;
+  color: #0f172a;
+
+  font-size: 11px;
+  line-height: 16px;
+
+  outline: none;
+}
+
+.numeric-control:focus {
+  border-color: #2563eb;
+  background: #ffffff;
+}
+
+.simulation-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.headless-button {
+  margin-top: 10px;
+}
+
+.headless-status {
+  min-height: 32px;
+}
+
+.headless-result-label {
+  margin-top: 28px;
+}

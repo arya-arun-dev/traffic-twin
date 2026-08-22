@@ -1,0 +1,10 @@
+.git
+.gitignore
+node_modules
+dist
+services/simulation-service/node_modules
+services/simulation-service/dist
+backend/spring-api/target
+.env
+.env.local
+*.log

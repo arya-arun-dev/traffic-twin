@@ -24,3 +24,11 @@ dist-ssr
 *.sw?
 
 .env.local
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Java build output
+backend/spring-api/target/

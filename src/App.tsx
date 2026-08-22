@@ -53,6 +53,18 @@ import type {
   ScenarioMetrics,
 } from './scenario/ScenarioExperiment';
 
+import {
+  runHeadlessExperiment,
+} from './application/headlessExperimentClient';
+
+import type {
+  HeadlessExperimentResponse,
+} from './application/headlessExperimentClient';
+
+import {
+  toRoadGraphDto,
+} from './transport/roadGraphDto';
+
 import type {
   SimulationWorkerCommand,
   SimulationWorkerResponse,
@@ -74,7 +86,7 @@ const ROAD_RADIUS_METERS =
 const DEFAULT_VEHICLE_COUNT =
   500;
 
-const EXPERIMENT_SEED =
+const DEFAULT_EXPERIMENT_SEED =
   20260821;
 
 
@@ -225,6 +237,41 @@ function App() {
     );
 
   const [
+    experimentSeed,
+    setExperimentSeed,
+  ] =
+    useState(
+      DEFAULT_EXPERIMENT_SEED
+    );
+
+  const [
+    headlessRunning,
+    setHeadlessRunning,
+  ] =
+    useState(
+      false
+    );
+
+  const [
+    headlessStatus,
+    setHeadlessStatus,
+  ] =
+    useState(
+      'No headless experiment run yet.'
+    );
+
+  const [
+    headlessResult,
+    setHeadlessResult,
+  ] =
+    useState<
+      HeadlessExperimentResponse
+      | null
+    >(
+      null
+    );
+
+  const [
     comparisonEnabled,
     setComparisonEnabled,
   ] =
@@ -320,6 +367,11 @@ function App() {
       | null
     >(
       null
+    );
+
+  const headlessRequestTokenRef =
+    useRef(
+      0
     );
 
   const suppressAutocompleteRef =
@@ -561,6 +613,8 @@ function App() {
       string[],
     requestedVehicleCount:
       number,
+    seed:
+      number,
     compare:
       boolean,
     startRunning:
@@ -581,8 +635,7 @@ function App() {
         closedSegmentKeys:
           closures,
         requestedVehicleCount,
-        seed:
-          EXPERIMENT_SEED,
+        seed,
         comparisonEnabled:
           compare,
         running:
@@ -608,6 +661,8 @@ function App() {
       string[],
     requestedVehicleCount:
       number,
+    seed:
+      number,
     compare:
       boolean
   ): number | null {
@@ -624,8 +679,7 @@ function App() {
         closedSegmentKeys:
           closures,
         requestedVehicleCount,
-        seed:
-          EXPERIMENT_SEED,
+        seed,
         comparisonEnabled:
           compare,
         running:
@@ -745,12 +799,24 @@ function App() {
         []
       );
 
+      headlessRequestTokenRef.current +=
+        1;
+
+      setHeadlessResult(
+        null
+      );
+
+      setHeadlessStatus(
+        'No headless experiment run yet.'
+      );
+
 
       const experimentId =
         initializeExperiment(
           nextGraph,
           [],
           vehicleCount,
+          experimentSeed,
           comparisonEnabled
         );
 
@@ -853,6 +919,7 @@ function App() {
             nextGraph,
             [],
             DEFAULT_VEHICLE_COUNT,
+            DEFAULT_EXPERIMENT_SEED,
             false,
             runningRef.current
           );
@@ -1039,7 +1106,9 @@ function App() {
     nextClosures:
       string[] = closedSegmentKeys,
     nextComparison:
-      boolean = comparisonEnabled
+      boolean = comparisonEnabled,
+    nextSeed:
+      number = experimentSeed
   ) {
 
     if (!graph) {
@@ -1051,6 +1120,7 @@ function App() {
       resetExperiment(
         nextClosures,
         nextVehicleCount,
+        nextSeed,
         nextComparison
       );
 
@@ -1078,6 +1148,165 @@ function App() {
   }
 
 
+  function invalidateHeadlessResult() {
+
+    headlessRequestTokenRef.current +=
+      1;
+
+    setHeadlessResult(
+      null
+    );
+
+    setHeadlessStatus(
+      'Configuration changed. Run a new headless experiment.'
+    );
+  }
+
+
+  function updateExperimentSeed(
+    nextSeed: number
+  ) {
+
+    if (
+      !Number.isFinite(
+        nextSeed
+      )
+    ) {
+      return;
+    }
+
+
+    const normalizedSeed =
+      Math.min(
+        0xFFFF_FFFF,
+        Math.max(
+          0,
+          Math.trunc(
+            nextSeed
+          )
+        )
+      );
+
+
+    setExperimentSeed(
+      normalizedSeed
+    );
+
+    invalidateHeadlessResult();
+
+
+    restartExperiment(
+      vehicleCount,
+      closedSegmentKeys,
+      comparisonEnabled,
+      normalizedSeed
+    );
+  }
+
+
+  async function submitHeadlessExperiment() {
+
+    if (
+      !graph
+      ||
+      headlessRunning
+    ) {
+      return;
+    }
+
+
+    const requestToken =
+      headlessRequestTokenRef.current
+      + 1;
+
+    headlessRequestTokenRef.current =
+      requestToken;
+
+
+    setHeadlessRunning(
+      true
+    );
+
+    setHeadlessResult(
+      null
+    );
+
+    setHeadlessStatus(
+      'Running server-side experiment...'
+    );
+
+
+    try {
+
+      const result =
+        await runHeadlessExperiment({
+          network:
+            toRoadGraphDto(
+              graph
+            ),
+          closedSegmentKeys,
+          requestedVehicleCount:
+            vehicleCount,
+          seed:
+            experimentSeed,
+          comparisonEnabled,
+          maxSimulationSeconds:
+            1800,
+        });
+
+
+      if (
+        requestToken
+        !== headlessRequestTokenRef.current
+      ) {
+        return;
+      }
+
+
+      setHeadlessResult(
+        result
+      );
+
+      setHeadlessStatus(
+        result.completionReason
+        === 'ALL_TRIPS_COMPLETED'
+        ? 'Headless experiment completed.'
+        : 'Headless experiment reached the simulation-duration limit.'
+      );
+
+    } catch (error) {
+
+      console.error(
+        error
+      );
+
+      if (
+        requestToken
+        !== headlessRequestTokenRef.current
+      ) {
+        return;
+      }
+
+
+      setHeadlessResult(
+        null
+      );
+
+      setHeadlessStatus(
+        error instanceof Error
+        ? error.message
+        : 'Headless experiment failed.'
+      );
+
+    } finally {
+
+      setHeadlessRunning(
+        false
+      );
+    }
+  }
+
+
   function updateVehicleCount(
     nextCount: number
   ) {
@@ -1085,6 +1314,8 @@ function App() {
     setVehicleCount(
       nextCount
     );
+
+    invalidateHeadlessResult();
 
 
     restartExperiment(
@@ -1104,6 +1335,8 @@ function App() {
     setComparisonEnabled(
       nextEnabled
     );
+
+    invalidateHeadlessResult();
 
 
     restartExperiment(
@@ -1138,6 +1371,8 @@ function App() {
       nextClosures
     );
 
+    invalidateHeadlessResult();
+
 
     restartExperiment(
       vehicleCount,
@@ -1156,6 +1391,8 @@ function App() {
     setSelectedRoad(
       null
     );
+
+    invalidateHeadlessResult();
 
 
     restartExperiment(
@@ -1547,6 +1784,35 @@ function App() {
             />
 
 
+            <label className="control-label seed-control-label">
+
+              <span>
+                Deterministic seed
+              </span>
+
+            </label>
+
+
+            <input
+              className="numeric-control"
+              type="number"
+              min="0"
+              max="4294967295"
+              step="1"
+              value={
+                experimentSeed
+              }
+              onChange={
+                event =>
+                  updateExperimentSeed(
+                    Number(
+                      event.target.value
+                    )
+                  )
+              }
+            />
+
+
             <button
               className="simulation-button"
               type="button"
@@ -1608,6 +1874,43 @@ function App() {
             <p className="small-note">
               Baseline and intervention runs use the same
               deterministic seed and paired OD agents.
+            </p>
+
+          </section>
+
+
+          <section>
+
+            <span className="section-label">
+              HEADLESS EXPERIMENT
+            </span>
+
+            <p className="small-note left">
+              Runs the current network and scenario on the
+              server without map rendering or real-time pacing.
+            </p>
+
+            <button
+              className="simulation-button headless-button"
+              type="button"
+              disabled={
+                !graph
+                ||
+                headlessRunning
+              }
+              onClick={
+                submitHeadlessExperiment
+              }
+            >
+              {
+                headlessRunning
+                ? 'Running headless experiment...'
+                : 'Run headless experiment'
+              }
+            </button>
+
+            <p className="status headless-status">
+              {headlessStatus}
             </p>
 
           </section>
@@ -2002,6 +2305,93 @@ function App() {
             </p>
 
           </section>
+
+
+          {
+            headlessResult
+            && (
+              <>
+
+                <span className="section-label headless-result-label">
+                  HEADLESS RESULT
+                </span>
+
+
+                <Metric
+                  label="Server throughput"
+                  value={
+                    headlessResult.scenarioMetrics
+                    ? `${headlessResult.scenarioMetrics.throughputPerMinute.toFixed(1)}/min`
+                    : '—'
+                  }
+                  emphasis
+                />
+
+
+                {
+                  headlessResult.baselineMetrics
+                  && (
+                    <Metric
+                      label="Server baseline throughput"
+                      value={
+                        `${headlessResult.baselineMetrics.throughputPerMinute.toFixed(1)}/min`
+                      }
+                    />
+                  )
+                }
+
+
+                {
+                  headlessResult.comparisonEnabled
+                  && (
+                    <Metric
+                      label="Throughput delta"
+                      value={
+                        headlessResult.throughputDeltaPercent
+                        === null
+                        ? '—'
+                        : `${headlessResult.throughputDeltaPercent >= 0 ? '+' : ''}`
+                          + `${headlessResult.throughputDeltaPercent.toFixed(1)}%`
+                      }
+                    />
+                  )
+                }
+
+
+                <Metric
+                  label="Server completed trips"
+                  value={
+                    headlessResult.completedTrips
+                    ?.toLocaleString()
+                    ?? '—'
+                  }
+                />
+
+
+                <Metric
+                  label="Server simulated time"
+                  value={
+                    headlessResult.simulationDurationSeconds
+                    === null
+                    ? '—'
+                    : `${Math.floor(headlessResult.simulationDurationSeconds)} s`
+                  }
+                />
+
+
+                <Metric
+                  label="Completion"
+                  value={
+                    headlessResult.completionReason
+                    === 'ALL_TRIPS_COMPLETED'
+                    ? 'All trips completed'
+                    : 'Duration limit reached'
+                  }
+                />
+
+              </>
+            )
+          }
 
         </aside>
 

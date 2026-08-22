@@ -1,0 +1,26 @@
+{
+  "name": "traffic-twin-simulation-service",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "npm run typecheck && esbuild src/server.ts --bundle --packages=external --platform=node --format=esm --target=node24 --outfile=dist/server.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test test/**/*.test.ts",
+    "start": "node dist/server.mjs"
+  },
+  "dependencies": {
+    "fastify": "^5.11.3",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.23.12",
+    "typescript": "~6.0.2"
+  }
+}

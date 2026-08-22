@@ -149,11 +149,7 @@ export async function fetchRoadNetwork(
         throw lastError;
       }
 
-
-      const data:
-        OsmResponse =
-        await response.json();
-
+      const data = (await response.json()) as OsmResponse;
 
       return data;
 
