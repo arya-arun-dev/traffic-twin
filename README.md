@@ -24,7 +24,7 @@ The platform uses a multi-service full-stack architecture that separates fronten
 * **Intelligent Driver Model (IDM):** Calculates microscopic vehicle acceleration based on desired speed, current speed, relative velocity, minimum spacing, and time-headway behavior.
 * **Off-Main-Thread Execution:** Browser simulations execute in a Web Worker so microscopic simulation work does not block the React/UI thread.
 * **Dynamic OpenStreetMap Network Ingestion:** Fetches real-world road geometries on demand through the OpenStreetMap Overpass API and constructs a directed road graph containing road geometry, segment length, speed limits, and lane metadata.
-- **A* Routing:** Computes free-flow vehicle routes across the directed road graph using travel-time edge costs.
+- **A\* Routing:** Computes free-flow vehicle routes across the directed road graph using travel-time edge costs.
 * **Traffic Intervention Experiments:** Supports road-closure scenarios with deterministic baseline/scenario comparison.
 * **Explicit Junction Handling:** Vehicles request admission when transitioning between road segments, with downstream entry-safety checks applied before junction movement.
 * **Headless Experiment Execution:** Runs server-side simulations without map rendering or wall-clock pacing, allowing the fixed simulation timestep to execute as quickly as server CPU permits.
