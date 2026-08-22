@@ -1,32 +1,46 @@
 # Traffic Twin
 
-**Traffic Twin** is a client-side digital twin simulation engine and visualization system designed to model multi-agent urban traffic flow, path routing, driver behavior, and scenario experiments directly in the browser.
+**Traffic Twin** is a full-stack digital twin traffic simulation engine and visualization system modeling multi-agent urban traffic flow, path routing, driver behavior, and scenario experiments directly in the browser and via distributed backend services.
+
+**Live Demo:** [diligent-fascination-production-e858.up.railway.app](https://diligent-fascination-production-e858.up.railway.app)
 
 ---
 
-## Technical Overview & System Architecture
+## Technical Architecture
 
-The application is structured into decoupled domain models, data ingestion, scenario management, and UI visualization components.
+The platform uses a distributed microservices architecture, separating frontend rendering, background Web Worker math execution, headless simulation services, and an orchestrating backend API.
 
-<img width="589" height="491" alt="image" src="https://github.com/user-attachments/assets/49d8464c-6231-489f-bc80-6121304b2f3e" />
+<img width="594" height="862" alt="image" src="https://github.com/user-attachments/assets/e5ed2115-3b5b-4ad4-8572-4a2b3b8fe342" />
 
+
+### Module Breakdown
+
+* **`src/worker/` & `src/model/` (Client Engine):** Executes microscopic Intelligent Driver Model (IDM) physics, car-following calculations, and $A^*$/Dijkstra graph pathfinding off the UI thread via Web Workers (`simulation.worker.ts`).
+* **`backend/spring-api/` (API Orchestrator):** A Java Spring Boot service managing experiment lifecycle, scenario metrics, PostgreSQL/H2 persistence, and client-facing REST endpoints.
+* **`services/simulation-service/` (Headless Engine):** An isolated TypeScript/Node.js service for running batch traffic experiments, scenario evaluations, and server-side metrics calculations out-of-band.
+* **`src/components/` & `src/application/` (UI Layer):** Converts raw spatial edge occupancy maps into latitude/longitude vectors (`viewModels.ts`) and paints vehicle movements onto an HTML5 Canvas/Leaflet map (`TrafficMap.tsx`).
 
 ---
 
-## Core Features & Simulation Models
+## Core Features & Simulation Physics
 
-* **Intelligent Driver Model (IDM):** Implements microscopic longitudinal car-following dynamics to compute agent acceleration based on desired velocity, safe distance, and relative headways.
-* **OSM Network Ingestion:** Fetches real-world street maps on demand via OpenStreetMap (Overpass API) and constructs directed graph representations with lane metadata.
-* **Dynamic Routing Engine:** Computes optimal paths across edge weight topologies with live re-routing support under network perturbations.
-* **Scenario & Intervention Engine:** Allows side-by-side traffic experimentation (e.g., lane closures, speed limit adjustments, traffic signal timing changes).
-* **Real-time Map Rendering:** Interactive MapTiler mapping interface for visualizing multi-agent movements and edge congestion metrics.
+* **Intelligent Driver Model (IDM):** Calculates real-time acceleration, velocity, and safe headway gap distributions for dynamic multi-agent flows.
+* **Off-Main-Thread Execution:** Web Worker worker threads prevent UI frame drops and maintain 60 FPS Canvas rendering during high agent counts.
+* **Dynamic OpenStreetMap Network Ingestion:** Fetches real-world road geometries on demand via OpenStreetMap's Overpass API and parses lane counts, turn directions, and max speed metadata.
+* **Traffic Intervention Experiments:** Simulates lane closures, capacity adjustments, and speed limit overrides with dynamic route recalculation.
+* **Headless Batch Analysis:** Supports server-side scenario execution to generate benchmark metrics (average travel times, bottleneck delays) without client rendering overhead.
 
 ---
 
 ## Tech Stack
 
-* **Language:** TypeScript[cite: 1]
-* **Build Tooling & Dev Server:** Vite[cite: 1]
-* **UI Framework:** React[cite: 1]
-* **Linting & Code Quality:** Oxlint (`.oxlintrc.json`)[cite: 1]
-* **Type Checking:** `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`[cite: 1]
+### Frontend & Client Engine
+* **Language/Framework:** TypeScript, React, Vite
+* **Concurrency:** Web Workers (`simulation.worker.ts`)
+* **Rendering & Visualization:** Leaflet, HTML5 Canvas Context
+
+### Backend Services & Storage
+* **API Gateway Service:** Java 17+, Spring Boot, Spring Data JPA
+* **Simulation Service:** Node.js, TypeScript, Express
+* **Database:** PostgreSQL / H2 Embedded Database (`schema.sql`)
+* **Containerization & Deployment:** Docker, Docker Compose, Nginx, Railway
