@@ -2,7 +2,7 @@
 
 **Traffic Twin** is a full-stack traffic simulation and visualization platform designed to model vehicle movement, path routing, driver behavior, and intervention experiments on real-world road networks. It supports both interactive browser execution and server-side headless experiments.
 
-**Live Demo:** [diligent-fascination-production-e858.up.railway.app](https://diligent-fascination-production-e858.up.railway.app/)
+**Live Demo:** [traffictwin.up.railway.app](https://traffictwin.up.railway.app/)
 
 ---
 
