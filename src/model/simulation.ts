@@ -1287,7 +1287,6 @@ function commitVehicleUpdates(
   for (
     const [
       edge,
-      edgeUpdates,
     ]
     of updates
   ) {
