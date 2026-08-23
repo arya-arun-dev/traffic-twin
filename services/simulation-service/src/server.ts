@@ -17,6 +17,7 @@ import {
 const server =
   Fastify({
     logger: true,
+    bodyLimit: 20 * 1024 * 1024,
   });
 
 
