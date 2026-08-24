@@ -1768,7 +1768,7 @@ function App() {
               className="range-control"
               type="range"
               min="100"
-              max="5000"
+              max="2500"
               step="100"
               value={
                 vehicleCount
