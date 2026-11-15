@@ -43,12 +43,48 @@ export function loadRoadNetwork(
   }
 
 
-  const request =
-    fetchRoadNetwork(
+  const request = (async (): Promise<OsmResponse> => {
+    const isDefaultAustin =
+      latitude.toFixed(6) === '30.267200' &&
+      longitude.toFixed(6) === '-97.743100' &&
+      radiusMeters === 1500;
+
+    if (isDefaultAustin) {
+      try {
+        const response = await fetch(
+          `${import.meta.env.BASE_URL}data/austin-roads.json`,
+          { signal: AbortSignal.timeout(5000) }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Snapshot request failed: ${response.status}`);
+        }
+
+        const data = await response.json() as OsmResponse;
+
+        if (
+          !Array.isArray(data.elements) ||
+          !data.elements.some(element => element.type === 'node') ||
+          !data.elements.some(element => element.type === 'way')
+        ) {
+          throw new Error('Invalid Austin snapshot.');
+        }
+
+        return data;
+      } catch (error) {
+        console.warn(
+          'Austin snapshot unavailable; trying Overpass.',
+          error
+        );
+      }
+    }
+
+    return fetchRoadNetwork(
       latitude,
       longitude,
       radiusMeters
     );
+  })();
 
 
   requestCache.set(
