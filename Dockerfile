@@ -9,9 +9,6 @@ COPY index.html vite.config.ts tsconfig.json tsconfig.app.json tsconfig.node.jso
 COPY public ./public
 COPY src ./src
 
-COPY scripts ./scripts
-RUN node scripts/cache-austin.mjs
-
 ARG VITE_MAPTILER_API_KEY
 ARG VITE_API_BASE_URL=http://localhost:8080
 
